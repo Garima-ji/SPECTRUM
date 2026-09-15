@@ -1,0 +1,101 @@
+services:
+  db:
+    image: postgres:15-alpine
+    pull_policy: never
+    container_name: spectrum_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: spectrum
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d spectrum" ]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  ollama:
+    image: ollama/ollama:latest
+    pull_policy: never
+    container_name: spectrum_ollama
+    restart: always
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    healthcheck:
+      test: [ "CMD", "ollama", "list" ]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  ollama-init:
+    image: ollama/ollama:latest
+    pull_policy: never
+    container_name: spectrum_ollama_init
+    restart: "no"
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+      - OLLAMA_MODEL=${OLLAMA_MODEL:-qwen2.5:latest}
+    entrypoint: [ "/bin/sh", "-lc" ]
+    command:
+      - |
+        if ! ollama list | grep -q "${OLLAMA_MODEL:-qwen2.5:latest}"; then
+          echo "Model ${OLLAMA_MODEL:-qwen2.5:latest} not found locally; pulling once...";
+          ollama pull "${OLLAMA_MODEL:-qwen2.5:latest}";
+        else
+          echo "Model ${OLLAMA_MODEL:-qwen2.5:latest} already available locally; skipping pull.";
+        fi
+    depends_on:
+      ollama:
+        condition: service_healthy
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: spectrum_backend
+    restart: always
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/spectrum
+      - OLLAMA_URL=http://ollama:11434
+      - OLLAMA_MODEL=${OLLAMA_MODEL:-qwen2.5:latest}
+      - OLLAMA_TIMEOUT_SECONDS=600
+      - WHISPER_MODEL=${WHISPER_MODEL:-small}
+      - WHISPER_DEVICE=cpu
+      - WHISPER_COMPUTE_TYPE=int8
+      - WHISPER_LANGUAGE=${WHISPER_LANGUAGE:-}
+      - WHISPER_TASK=transcribe
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+      - ./backend/app:/app/app
+      - whisper_cache:/root/.cache
+    depends_on:
+      db:
+        condition: service_healthy
+      ollama-init:
+        condition: service_completed_successfully
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: spectrum_frontend
+    restart: always
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+    environment:
+      - VITE_API_URL=http://localhost:8000/api
+
+volumes:
+  pgdata:
+  ollama_data:
+  whisper_cache:

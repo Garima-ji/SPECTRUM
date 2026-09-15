@@ -1,0 +1,12 @@
+Use only the supplied evidence to classify the implementation status of a policy, project, promise, or public commitment mentioned in the claim. If the claim is not about implementation, or the evidence is insufficient, return "No Reliable Update".
+
+Return only valid JSON:
+{{
+  "status": "Completed | In Progress | Delayed | Not Started | No Reliable Update"
+}}
+
+Claim:
+{claim}
+
+Evidence:
+{evidence}

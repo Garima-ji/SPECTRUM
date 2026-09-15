@@ -1,0 +1,9 @@
+Generate one precise web-search query that can verify the claim using primary or high-quality reporting. Preserve proper nouns, numbers, dates, and the factual relationship. For Hindi or Hinglish claims, prefer an accurate English query when it will retrieve better sources, but never alter entities, numbers, or dates. Prefer terms that surface PIB, government ministries, WHO, CDC, Reuters, AP, BBC, World Bank, UN, IMF, or Election Commission sources.
+
+Return only valid JSON:
+{{
+  "query": "search query"
+}}
+
+Claim:
+{claim}

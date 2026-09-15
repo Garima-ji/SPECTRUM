@@ -1,0 +1,43 @@
+VERDICTS = {"SUPPORTED", "REFUTED", "CONFLICTING", "INSUFFICIENT EVIDENCE"}
+STATUSES = {"Completed", "In Progress", "Delayed", "Not Started", "No Reliable Update"}
+VERIFICATION_STATUSES = {"pending", "verifying", "completed", "failed"}
+AUDIO_STATUSES = {"processing", "transcribed", "completed", "failed"}
+
+VERDICT_ALIASES = {
+    # Canonical values
+    "SUPPORTED": "SUPPORTED",
+    "REFUTED": "REFUTED",
+    "CONFLICTING": "CONFLICTING",
+    "INSUFFICIENT EVIDENCE": "INSUFFICIENT EVIDENCE",
+
+    # Legacy mapping (so old DB rows or Ollama quirks still map to something valid)
+    "TRUE": "SUPPORTED",
+    "FALSE": "REFUTED",
+    "MISLEADING": "CONFLICTING",
+    "PARTIALLY TRUE": "CONFLICTING",
+    "UNVERIFIABLE": "INSUFFICIENT EVIDENCE",
+    
+    # Common Ollama paraphrases → canonical
+    "PARTLY TRUE": "CONFLICTING",
+    "MOSTLY TRUE": "SUPPORTED",
+    "MOSTLY FALSE": "REFUTED",
+    "UNVERIFIED": "INSUFFICIENT EVIDENCE",
+    "NOT VERIFIABLE": "INSUFFICIENT EVIDENCE",
+    "CANNOT VERIFY": "INSUFFICIENT EVIDENCE",
+    "CANNOT DETERMINE": "INSUFFICIENT EVIDENCE",
+    "INCONCLUSIVE": "INSUFFICIENT EVIDENCE",
+    "INDETERMINATE": "INSUFFICIENT EVIDENCE",
+    "NO EVIDENCE": "INSUFFICIENT EVIDENCE",
+    "MIXED": "CONFLICTING",
+
+    # Support/contradiction synonyms
+    "CORRECT": "SUPPORTED",
+    "ACCURATE": "SUPPORTED",
+    "VERIFIED": "SUPPORTED",
+    "CONFIRMED": "SUPPORTED",
+    "INCORRECT": "REFUTED",
+    "INACCURATE": "REFUTED",
+    "CONTRADICTED": "REFUTED",
+    "DEBUNKED": "REFUTED",
+    "WRONG": "REFUTED",
+}

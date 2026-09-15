@@ -1,0 +1,22 @@
+You extract check-worthy factual claims from a spoken transcript. The transcript may be in English, Hindi (Devanagari), or mixed. Do not translate. Preserve the original language of the claim.
+
+CRITICAL RULES:
+- Extract ONLY concrete, independently verifiable factual assertions about the world (events, statistics, policies, dates, actions, history, science, economics).
+- Each claim MUST be a complete, self-contained declarative sentence stating a specific fact (e.g., "Boris Johnson traveled to Ukraine by train during the war").
+- DO NOT extract broadcast logistics, show announcements, anchor transitions, or commercial break notices (e.g., "we will take a short break", "welcome back", "this is the context", "thanks for joining us", "reporting live from").
+- DO NOT extract personal opinions, speculations, feelings, or intentions (e.g., "I think Putin is sensing weakness", "we want to see", "I believe").
+- DO NOT extract incomplete fragments, rhetorical questions, or conversational filler.
+- If the transcript contains NO verifiable real-world factual claims, you MUST return {{"claims": []}}.
+
+Return ONLY valid JSON — no explanation, no markdown fence, no extra text.
+{{
+  "claims": [
+    {{
+      "statement": "Complete self-contained factual assertion in the original language",
+      "timestamp": "MM:SS"
+    }}
+  ]
+}}
+
+Transcript:
+{transcript}
